@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>  </title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 350px; text-align: center; }
+        h2 { color: #1a73e8; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
+        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #218838; }
+        .error { color: #d93025; font-size: 14px; margin-top: 10px; display: none; background: #fce8e6; padding: 10px; border-radius: 5px; }
+        #profile { display: none; }
+        .balance-value { font-size: 48px; color: #28a745; margin: 20px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="login-form" class="card">
+        <h2>  </h2>
+        <input type="text" id="userInput" placeholder=" ">
+        <input type="password" id="passInput" placeholder=" ">
+        <button onclick="checkLogin()"> </button>
+        <p id="errorMsg" class="error">      </p>
+    </div>
+
+    <div id="profile" class="card">
+        <h3> </h3>
+        <h2 id="driverName"></h2>
+        <p>  </p>
+        <div class="balance-value"><span id="balance">0</span> <small style="font-size: 18px;"></small></div>
+        <button onclick="location.reload()" style="background-color: #6c757d;"> </button>
+    </div>
+
+    <script>
+        async function checkLogin() {
+            const u = document.getElementById('userInput').value.trim();
+            const p = document.getElementById('passInput').value.trim();
+            const err = document.getElementById('errorMsg');
+            
+            try {
+                const sheetId = '1vCsh_P9L5U0T42_V-n7D1pS0q60h3q0iE5vKz09_XqI';
+                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+                
+                const response = await fetch(url);
+                const text = await response.text();
+                const json = JSON.parse(text.substr(47).slice(0, -2));
+                const rows = json.table.rows;
+
+                let isFound = false;
+                for (let row of rows) {
+                    const name = row.c[0] ? String(row.c[0].v).trim() : "";
+                    const code = row.c[1] ? String(row.c[1].v).trim() : "";
+                    const pass = row.c[2] ? String(row.c[2].v).trim() : "";
+                    const bal  = row.c[3] ? row.c[3].v : "0";
+
+                    //    (Driver1 + 2026 + 1111)
+                    if (u === name && p === pass && code === "1111") {
+                        document.getElementById('login-form').style.display = 'none';
+                        document.getElementById('profile').style.display = 'block';
+                        document.getElementById('driverName').innerText = name;
+                        document.getElementById('balance').innerText = bal;
+                        isFound = true;
+                        break;
+                    }
+                }
+                if (!isFound) err.style.display = 'block';
+            } catch (error) {
+                alert("       ");
+            }
+        }
+    </script>
+</body>
+</html>
